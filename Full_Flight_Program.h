@@ -3,16 +3,23 @@
 
 short universalIndex = 0;
 
-short motor_time = 1000;
+short motor_time = 500;
 short flightStage = 0;
 
 float thetaX; //NOT USED FOR PID SO NOT AN ARRAY
 float thetaY[3]; //Rocket pitch angle Y axis
 float thetaZ[3]; //Rocket pitch angle Z axis
-short runtime[1000];
+short runtime[500];
+
+float thetaY_offset = -1.18; //Initial Y-axis pitch offset when on launch pad -- MEANT TO ZERO THE ORIENTATION SENSOR
+float thetaZ_offset = -91.50; //Initial Z-axis pitch offset when on launch pad -- MEANT TO ZERO THE ORIENTATION SENSOR
+
 
 float gimbal_angleY[2]; //Gimbal Angle Y axis
 float gimbal_angleZ[2]; //Gimbal Angle Z axis
+
+float errorY[2];
+float errorZ[2];
 
 double pi = atan(1)*4;
 
@@ -20,7 +27,7 @@ float max_angle = 8.0; //max angle for gimbal
 float time_step = 0.01; //update rate on BNO055 IMU ~10ms
 float maxRotationPerStep = 20/0.1*time_step;  //TEMPORARY VALUE - 100ms/60deg - TO BE REPLACED WITH MEASURED VALUE
 
-float theta0 = -0*pi/180; //0 degree pitch target
+float theta0 = 0; //0 degree pitch target
 
 float altitude = 0;
 float pressure = 0;
@@ -55,8 +62,6 @@ short gimbal_angleIntZ = 0;
 
 short gimbal_angleDecimalY = 0;
 short gimbal_angleDecimalZ = 0;
-
-//flightStage, euler int(3), euler decimal (3), euler pos/neg flags (3), gimbalAngle int(2), gimbalAngle decimal (2), pressure int, pressure decimal, altitude decimal 1, altitude decimal 2, altitude int, servo angles (2)
 
 
 int findTopAngleRatio(float angle) {
@@ -107,6 +112,7 @@ float proportional_errorY = 0.0; //Declares proportional_error variable for Y ax
 float integral_errorY = 0.0; //Declares integral_error variable for Y axis
 float derivative_errorY = 0.0; //Declares derivative_error variable for Y axis
 float outputY = 0.0; //Declares PID output variable for Y axis
+
 
 float proportional_errorZ = 0.0; //Declares proportional_error variable for Z axis
 float integral_errorZ = 0.0; //Declares integral_error variable for Z axis
