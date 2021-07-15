@@ -2,9 +2,15 @@
 #include <math.h>
 
 short universalIndex = 0;
+short poweredFlightIndex = 0;
+short unpoweredFlightIndex = 0;
+short ballisticDescentIndex = 0;
+short chuteDescentIndex = 0;
 
-short motor_time = 500;
+short motor_time = 350;
 short flightStage = 0;
+
+float chuteAltitude = 263.0;
 
 float thetaX; //NOT USED FOR PID SO NOT AN ARRAY
 float thetaY[3]; //Rocket pitch angle Y axis
