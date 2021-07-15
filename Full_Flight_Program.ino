@@ -366,7 +366,7 @@ void poweredFlightStall() {
       break;
     }
     //Serial.print(F(" Count= "));
-    //Serial.println(flightStallCount);
+    Serial.println(flightStallCount);
   }
 }
 
@@ -374,10 +374,10 @@ void poweredFlightStall() {
 //Powered Flight Stage Function -- Includes PID algorithm and recording of data
 void poweredFlight() {
 
+  flightStage = 2; //changes flight stage marker to 2
+
   //Function to stall PID from running until the rocket detects vertical acceleration while sitting on the launch pad
   poweredFlightStall();
-
-  flightStage = 2; //changes flight stage marker to 2
   
   Serial.begin(115200); //Setup command to begin sending information to the Serial monitor at the baudrate specified
   
@@ -500,11 +500,11 @@ void poweredFlight() {
 
     // Print Statement for all relevant information while for loop is active ----- Can be commented out during actual flights to reduce lag between measurements
     Serial.print(F("n= "));
-    Serial.print(universalIndex);
+    Serial.println(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
-    Serial.print(F(" ThetaX= "));
-    Serial.print(thetaX);
+//    Serial.print(F(" ThetaX= "));
+//    Serial.print(thetaX);
 //    Serial.print(F(" thetaIntX= "));
 //    Serial.print(thetaIntX);
 //    Serial.print(F(" thetaDecimalX= "));
@@ -512,16 +512,16 @@ void poweredFlight() {
 //    Serial.print(F(" thetaFlagX= "));
 //    Serial.println(thetaFlagX);
 
-    Serial.print(F("thetaY= "));
-    Serial.print(thetaY[0]);
+//    Serial.print(F("thetaY= "));
+//    Serial.print(thetaY[0]);
 //    Serial.print(F(" thetaIntY= "));
 //    Serial.print(thetaIntY);
 //    Serial.print(F(" thetaDecimalY= "));
 //    Serial.print(thetaDecimalY);
 //    Serial.print(F(" thetaFlagY= "));
 //    Serial.print(thetaFlagY);
-    Serial.print(F(" thetaZ= "));
-    Serial.println(thetaZ[0]);
+//    Serial.print(F(" thetaZ= "));
+//    Serial.println(thetaZ[0]);
 //    Serial.print(F(" thetaIntZ= "));
 //    Serial.print(thetaIntZ);
 //    Serial.print(F(" thetaDecimalZ= "));
@@ -756,11 +756,11 @@ void poweredFlight() {
     // Print Statement for all relevant information while PID loop is active ----- Can be commented out during actual flights to reduce lag between measurements
         
     Serial.print(F("n= "));
-    Serial.print(universalIndex);
+    Serial.println(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
-    Serial.print(F(" ThetaX= "));
-    Serial.print(thetaX);
+//    Serial.print(F(" ThetaX= "));
+//    Serial.print(thetaX);
 //    Serial.print(F(" thetaIntX= "));
 //    Serial.print(thetaIntX);
 //    Serial.print(F(" thetaDecimalX= "));
@@ -768,16 +768,16 @@ void poweredFlight() {
 //    Serial.print(F(" thetaFlagX= "));
 //    Serial.println(thetaFlagX);
 
-    Serial.print(F("thetaY= "));
-    Serial.print(thetaY[0]);
+//    Serial.print(F("thetaY= "));
+//    Serial.print(thetaY[0]);
 //    Serial.print(F(" thetaIntY= "));
 //    Serial.print(thetaIntY);
 //    Serial.print(F(" thetaDecimalY= "));
 //    Serial.print(thetaDecimalY);
 //    Serial.print(F(" thetaFlagY= "));
 //    Serial.print(thetaFlagY);
-    Serial.print(F(" thetaZ= "));
-    Serial.println(thetaZ[0]);
+//    Serial.print(F(" thetaZ= "));
+//    Serial.println(thetaZ[0]);
 //    Serial.print(F(" thetaIntZ= "));
 //    Serial.print(thetaIntZ);
 //    Serial.print(F(" thetaDecimalZ= "));
@@ -833,11 +833,15 @@ void poweredFlight() {
 // Unpowered Flight Stage Function
 void unpoweredFlight() {
 
+  poweredFlightIndex = universalIndex + 1;
+  universalIndex = 0;
+
   flightStage = 3; //changes flight stage marker to 3
   
   altitudePrev = altitude; //Variable to keep track of and compare the current altitude measurement to the previous one
   pressurePrev = pressure; //Variable to keep track of and compare the current pressure measurement to the previous one
-
+  
+  short unpoweredIndex = 0;
   bool unpoweredFlag = true; //Flag to mark whether or not the loop keeps going
   while (unpoweredFlag == true) { //While loop to record orientation, altitude, and pressure data until the rocket begins descending
     
@@ -891,42 +895,48 @@ void unpoweredFlight() {
     pressureFirst = floor(floor(pressure)/100); //Separates decimal digits of pressure measurement
 
     //Writing values to FRAM chip for Unpowered Flight stage
-    fram.write8(universalIndex*22, flightStage); //FLIGHT STAGE
+    fram.write8(poweredFlightIndex*22 + universalIndex*16, flightStage); //FLIGHT STAGE
       
     //ORIENTATION
-    fram.write8(universalIndex*22+1, thetaIntX); //Integer value X-axis
-    fram.write8(universalIndex*22+2, thetaDecimalX); //Decimal value X-axis
-    fram.write8(universalIndex*22+3, thetaFlagX); //Positive / Negative Flag X-axis
-    fram.write8(universalIndex*22+4, thetaIntY); //Integer value Y-axis
-    fram.write8(universalIndex*22+5, thetaDecimalY); //Decimal value Y-axis
-    fram.write8(universalIndex*22+6, thetaFlagY); //Positive / Negative Flag Y-axis
-    fram.write8(universalIndex*22+7, thetaIntZ); //Integer value Z-axis
-    fram.write8(universalIndex*22+8, thetaDecimalZ); //Decimal value Z-axis
-    fram.write8(universalIndex*22+9, thetaFlagZ); //Positive / Negative Flag Z-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+1, thetaIntX); //Integer value X-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+2, thetaDecimalX); //Decimal value X-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+3, thetaFlagX); //Positive / Negative Flag X-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+4, thetaIntY); //Integer value Y-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+5, thetaDecimalY); //Decimal value Y-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+6, thetaFlagY); //Positive / Negative Flag Y-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+7, thetaIntZ); //Integer value Z-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+8, thetaDecimalZ); //Decimal value Z-axis
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+9, thetaFlagZ); //Positive / Negative Flag Z-axis
     
     //ALTITUDE
-    fram.write8(universalIndex*22+16, altitudeFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+17, altitudeMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+18, altitudeLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+10, altitudeFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+11, altitudeMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+12, altitudeLast); //Digits in the Tenths and Hundredths place
 
     //PRESSURE
-    fram.write8(universalIndex*22+19, pressureFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+20, pressureMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+21, pressureLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+13, pressureFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+14, pressureMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + universalIndex*16+15, pressureLast); //Digits in the Tenths and Hundredths place
 
     //No need to record gimbal or servo angles on fram chip anymore because they are no longer in use
 
     if (altitude < altitudePrev){ //and pressure > pressurePrev) { //Condition to end the loop and progress to the next flight stage
+      unpoweredIndex++;
+    }
+    
+    if (unpoweredIndex > 5){ //and pressure > pressurePrev) { //Condition to end the loop and progress to the next flight stage
       Serial.println("Unpowered Flight Loop Broken");
       unpoweredFlag = false;
       break;
     }    
 
+    Serial.println(unpoweredIndex);
+    
     altitudePrev = altitude; //Sets the previous altitude measurement equal to the current one in preparation to take a new measurement
     pressurePrev = pressure; //Sets the previous pressure measurement equal to the current one in preparation to take a new measurement
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(BNO055_SAMPLERATE_DELAY_MS);//Delay for selected BNO sample rate
+    delay(50);//Delay for selected BNO sample rate
   }
 }
 
@@ -935,6 +945,9 @@ void unpoweredFlight() {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Ballistic Descent Stage Function
 void ballisticDescent() {
+
+  unpoweredFlightIndex = universalIndex + 1;
+  universalIndex = 0;
 
   flightStage = 4; //changes flight stage marker to 4
     
@@ -992,37 +1005,37 @@ void ballisticDescent() {
     pressureFirst = floor(floor(pressure)/100); //Separates decimal digits of pressure measurement
 
     //Writing values to FRAM chip for Ballistic Descent stage
-    fram.write8(universalIndex*22, flightStage); //FLIGHT STAGE
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16, flightStage); //FLIGHT STAGE
       
     //ORIENTATION
-    fram.write8(universalIndex*22+1, thetaIntX); //Integer value X-axis
-    fram.write8(universalIndex*22+2, thetaDecimalX); //Decimal value X-axis
-    fram.write8(universalIndex*22+3, thetaFlagX); //Positive / Negative Flag X-axis
-    fram.write8(universalIndex*22+4, thetaIntY); //Integer value Y-axis
-    fram.write8(universalIndex*22+5, thetaDecimalY); //Decimal value Y-axis
-    fram.write8(universalIndex*22+6, thetaFlagY); //Positive / Negative Flag Y-axis
-    fram.write8(universalIndex*22+7, thetaIntZ); //Integer value Z-axis
-    fram.write8(universalIndex*22+8, thetaDecimalZ); //Decimal value Z-axis
-    fram.write8(universalIndex*22+9, thetaFlagZ); //Positive / Negative Flag Z-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+1, thetaIntX); //Integer value X-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+2, thetaDecimalX); //Decimal value X-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+3, thetaFlagX); //Positive / Negative Flag X-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+4, thetaIntY); //Integer value Y-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+5, thetaDecimalY); //Decimal value Y-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+6, thetaFlagY); //Positive / Negative Flag Y-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+7, thetaIntZ); //Integer value Z-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+8, thetaDecimalZ); //Decimal value Z-axis
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+9, thetaFlagZ); //Positive / Negative Flag Z-axis
     
     //ALTITUDE
-    fram.write8(universalIndex*22+16, altitudeFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+17, altitudeMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+18, altitudeLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+10, altitudeFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+11, altitudeMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+12, altitudeLast); //Digits in the Tenths and Hundredths place
 
     //PRESSURE
-    fram.write8(universalIndex*22+19, pressureFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+20, pressureMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+21, pressureLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+13, pressureFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+14, pressureMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + universalIndex*16+15, pressureLast); //Digits in the Tenths and Hundredths place
 
-    if (altitude < 350){ //m above sea level -- altitude threshold for parachute deployment -- PICK BETTER ALTITUDE THRESHOLD FOR PARACHUTE TO BE DEPLOYED ONCE ACTUAL TEST FLIGHTS START
+    if (altitude < chuteAltitude){ //Altitude threshold for parachute deployment -- measured in m above sea level -- *HEIGHT CAN BE CHANGED IN HEADER FILE*
       Serial.println(F("Ballistic Descent Loop Broken"));
       ballisticFlag = false;
       break;
     }
     
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(BNO055_SAMPLERATE_DELAY_MS); //Delay for selected BNO sample rate
+    delay(50); //Delay for selected BNO sample rate
   } 
   
 }
@@ -1032,6 +1045,9 @@ void ballisticDescent() {
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //Chute Descent Stage Function -- Includes parachute deployment commands
 void chuteDescent() {
+
+  ballisticDescentIndex = universalIndex + 1;
+  universalIndex = 0;
 
   myServo3.write(160); //angle for parachute system servo arm to release latch and deploy parachute -- POSSIBLE NEED TO CHANGE ANGLE AFTER TESTING
 
@@ -1057,17 +1073,17 @@ void chuteDescent() {
     pressureFirst = floor(floor(pressure)/100); //Separates decimal digits of pressure measurement
 
     //Writing values to FRAM chip for Chute Descent stage
-    fram.write8(universalIndex*22, flightStage); //FLIGHT STAGE
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7, flightStage); //FLIGHT STAGE
 
     //ALTITUDE
-    fram.write8(universalIndex*22+16, altitudeFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+17, altitudeMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+18, altitudeLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+1, altitudeFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+2, altitudeMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+3, altitudeLast); //Digits in the Tenths and Hundredths place
 
     //PRESSURE
-    fram.write8(universalIndex*22+19, pressureFirst); //Digits in the hundreds and thousands place
-    fram.write8(universalIndex*22+20, pressureMid); //Digits in the Tens and Ones place
-    fram.write8(universalIndex*22+21, pressureLast); //Digits in the Tenths and Hundredths place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+4, pressureFirst); //Digits in the hundreds and thousands place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+5, pressureMid); //Digits in the Tens and Ones place
+    fram.write8(poweredFlightIndex*22 + unpoweredFlightIndex*16 + ballisticDescentIndex*16 + universalIndex*7+6, pressureLast); //Digits in the Tenths and Hundredths place
 
     //No need to record orientation data after parachute deploys
 
@@ -1075,19 +1091,21 @@ void chuteDescent() {
       chuteIndex++;
     }
     else {
-      chuteIndex = 0; //Restarts the index if measurements are not equal
+      chuteIndex = 0;
     }
 
-    if (chuteIndex == 20) { //If statement to end chute descent loop after 20 consecutive, identical altitude measurements (2 seconds worth of measurements)
+    if (chuteIndex == 10) { //If statement to end chute descent loop after 20 consecutive, identical altitude measurements (2 seconds worth of measurements)
       Serial.println(F("Chute Descent Loop Broken"));
       chuteFlag = false;
       break;
     }
 
+    Serial.println(chuteIndex);
+
     altitudePrev = altitude; //Sets the previous altitude measurement equal to the current one in preparation to take a new measurement
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(BNO055_SAMPLERATE_DELAY_MS); //Delay for selected BNO sample rate
+    delay(50); //Delay for selected BNO sample rate
     
   }
 }
