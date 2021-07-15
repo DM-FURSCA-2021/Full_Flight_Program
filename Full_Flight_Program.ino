@@ -250,7 +250,7 @@ void groundIdle() {
   //Function to automatically move parachute servo to assist parachute packing in nose cone
   chutePacking();
   
-  Serial.println("Powered Flight Starting in 5");
+  Serial.println("Powered Flight Stage Starting in 5");
   delay(2000);
   Serial.println("3");
   delay(1000);
@@ -309,7 +309,7 @@ void chutePacking() {
         if (userInput3 == "yes" or userInput3 == "Yes") {
           delay(100);
           myServo3.write(90);
-          Serial.println("Continuing to next flight stage in 10 seconds");
+          Serial.println("Continuing to next flight stage in 15 seconds");
           delay(10000);
           inputFlag3 = true;
           break;
@@ -324,7 +324,7 @@ void chutePacking() {
       break;
     }
     else if (userInput1 == "no" or userInput1 == "No") {
-      Serial.println("Continuing to next Flight Stage in 10 seconds");
+      Serial.println("Continuing to next Flight Stage in 15 seconds");
       delay(10000);
       inputFlag1 = true;
       break;
@@ -375,7 +375,7 @@ void poweredFlightStall() {
 void poweredFlight() {
 
   //Function to stall PID from running until the rocket detects vertical acceleration while sitting on the launch pad
-  //poweredFlightStall();
+  poweredFlightStall();
 
   flightStage = 2; //changes flight stage marker to 2
   
@@ -389,9 +389,7 @@ void poweredFlight() {
   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
-
-  bno.setExtCrystalUse(true); //Sets the timing source for the BNO chip as an external source (the Arduino) instead of the internal crystal inside the chip -- this is to measure everything at the same time through the arduino
-
+  
 
 //PID gains----------------------------------
   float KP = 0.8; //PID Proportional Gain
@@ -502,11 +500,11 @@ void poweredFlight() {
 
     // Print Statement for all relevant information while for loop is active ----- Can be commented out during actual flights to reduce lag between measurements
     Serial.print(F("n= "));
-    Serial.println(universalIndex);
+    Serial.print(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
-//    Serial.print(F(" ThetaX= "));
-//    Serial.print(thetaX);
+    Serial.print(F(" ThetaX= "));
+    Serial.print(thetaX);
 //    Serial.print(F(" thetaIntX= "));
 //    Serial.print(thetaIntX);
 //    Serial.print(F(" thetaDecimalX= "));
@@ -514,16 +512,16 @@ void poweredFlight() {
 //    Serial.print(F(" thetaFlagX= "));
 //    Serial.println(thetaFlagX);
 
-//    Serial.print(F("thetaY= "));
-//    Serial.print(thetaY[0]);
+    Serial.print(F("thetaY= "));
+    Serial.print(thetaY[0]);
 //    Serial.print(F(" thetaIntY= "));
 //    Serial.print(thetaIntY);
 //    Serial.print(F(" thetaDecimalY= "));
 //    Serial.print(thetaDecimalY);
 //    Serial.print(F(" thetaFlagY= "));
 //    Serial.print(thetaFlagY);
-//    Serial.print(F(" thetaZ= "));
-//    Serial.print(thetaZ[0]);
+    Serial.print(F(" thetaZ= "));
+    Serial.println(thetaZ[0]);
 //    Serial.print(F(" thetaIntZ= "));
 //    Serial.print(thetaIntZ);
 //    Serial.print(F(" thetaDecimalZ= "));
@@ -758,11 +756,11 @@ void poweredFlight() {
     // Print Statement for all relevant information while PID loop is active ----- Can be commented out during actual flights to reduce lag between measurements
         
     Serial.print(F("n= "));
-    Serial.println(universalIndex);
+    Serial.print(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
-//    Serial.print(F(" ThetaX= "));
-//    Serial.print(thetaX);
+    Serial.print(F(" ThetaX= "));
+    Serial.print(thetaX);
 //    Serial.print(F(" thetaIntX= "));
 //    Serial.print(thetaIntX);
 //    Serial.print(F(" thetaDecimalX= "));
@@ -770,16 +768,16 @@ void poweredFlight() {
 //    Serial.print(F(" thetaFlagX= "));
 //    Serial.println(thetaFlagX);
 
-//    Serial.print(F("thetaY= "));
-//    Serial.print(thetaY[0]);
+    Serial.print(F("thetaY= "));
+    Serial.print(thetaY[0]);
 //    Serial.print(F(" thetaIntY= "));
 //    Serial.print(thetaIntY);
 //    Serial.print(F(" thetaDecimalY= "));
 //    Serial.print(thetaDecimalY);
 //    Serial.print(F(" thetaFlagY= "));
 //    Serial.print(thetaFlagY);
-//    Serial.print(F(" thetaZ= "));
-//    Serial.print(thetaZ[0]);
+    Serial.print(F(" thetaZ= "));
+    Serial.println(thetaZ[0]);
 //    Serial.print(F(" thetaIntZ= "));
 //    Serial.print(thetaIntZ);
 //    Serial.print(F(" thetaDecimalZ= "));
@@ -1105,9 +1103,9 @@ void setup() {
   
   groundIdle();
   poweredFlight();
-  //unpoweredFlight();
-  //ballisticDescent();
-  //chuteDescent();
+  unpoweredFlight();
+  ballisticDescent();
+  chuteDescent();
  
 }
 
