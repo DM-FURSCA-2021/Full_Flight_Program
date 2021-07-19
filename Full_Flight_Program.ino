@@ -215,11 +215,11 @@ void groundIdle() {
 
 
   //Servo Setup
-  myServo1.attach(servoPin1);
-  myServo2.attach(servoPin2);
-  myServo3.attach(servoPin3);
+  myServo1.attach(servoPin1); //Instructs the Arduino to associate the pin number defined as servoPin1 with servo1
+  myServo2.attach(servoPin2); //Instructs the Arduino to associate the pin number defined as servoPin2 with servo2
+  myServo3.attach(servoPin3); //Instructs the Arduino to associate the pin number defined as servoPin3 with servo3
   
-  Serial.println("Testing Servo 1");
+  Serial.println("Testing Servo 1"); //Gimbal servo 1 mobility test
   delay(500);
 
   myServo1.write(servoPos1);
@@ -232,7 +232,7 @@ void groundIdle() {
   delay(1000);
 
   
-  Serial.println("Testing Servo 2");
+  Serial.println("Testing Servo 2"); //Gimbal servo 2 mobility test
   delay(500);
   
   myServo2.write(servoPos2);
@@ -249,19 +249,20 @@ void groundIdle() {
 
   //Function to automatically move parachute servo to assist parachute packing in nose cone
   chutePacking();
-  
+
+  Serial.println("");
   Serial.println("Powered Flight Stage Starting in 5");
-  delay(2000);
+  delay(1000);
+  Serial.println("4");
+  delay(1000);
   Serial.println("3");
   delay(1000);
   Serial.println("2");
   delay(1000);
   Serial.println("1");
   delay(1000);
-  Serial.println("Initiating Powered Flight");
-
+  Serial.println("Progressing to Powered Flight Stage");
 }
-
 
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -271,67 +272,66 @@ void chutePacking() {
   Serial.println("Parachute Packing Sequence");
   Serial.println("Does the parachute need to be packed? (yes/no)");
   
-  bool inputFlag1 = false;
-  bool inputFlag2 = false;
-  bool inputFlag3 = false;
+  bool inputFlag1 = false; //while loop flag for first input prompt
+  bool inputFlag2 = false; //while loop flag for second input prompt
+  bool inputFlag3 = false; //while loop flag for third input prompt
   
-  while (inputFlag1 == false) {
-    while (Serial.available()==0){}
-    String userInput1 = Serial.readString();
+  while (inputFlag1 == false) { //While loop to make sure the user inputs only either 'yes' or 'no'
+    while (Serial.available()==0){} //Delays the program from progressing until the user enters something into the Serial monitor prompt
+    String userInput1 = Serial.readString(); //sets userInput1 equal to the serial input submitted by the user
     delay(100);
 
-    if (userInput1 == "yes" or userInput1 == "Yes") {
+    if (userInput1 == "yes" or userInput1 == "Yes") { //Protocol for when the parachute needs to be packed
       delay(100);
-      myServo3.write(170);
+      myServo3.write(170); //Uses the servo in the parachute system (servo3) to disengage the lock
       Serial.println("Parachute Deployment System Lock Disengaged");
       Serial.println("Are you ready to engage the Parachute Deployment System Lock? (type 'yes' when ready to proceed)");
-      while (inputFlag2 == false) {
-        while (Serial.available()==0){}
-        String userInput2 = Serial.readString();
+      while (inputFlag2 == false) { //While loop to make sure the user inputs only 'yes' when they are ready to proceed
+        while (Serial.available()==0){} //Delays the program from progressing until the user enters something into the Serial monitor prompt
+        String userInput2 = Serial.readString(); //sets userInput2 equal to the serial input submitted by the user
         delay(100);
-        if (userInput2 == "yes" or userInput2 == "Yes") {
+        if (userInput2 == "yes" or userInput2 == "Yes") { //proceeds if the user inputs 'yes'
           delay(100);
-          myServo3.write(90);
+          myServo3.write(90); //Uses the servo in the parachute system (servo3) to engage the lock
           Serial.println("Parachute Deployment System Lock Engaged");
-          inputFlag2 = true;
-          break;
+          inputFlag2 = true; //changes the flag to from false to true to stop the while loop
+          break; //backup break for while loop
         }
-        else {
+        else { //repeats prompt if user does not input 'yes'
           Serial.println("Please type 'yes' when you are ready to proceed");
-          inputFlag2 = false;
+          inputFlag2 = false; //keeps the flag equal to false so the loop repeats
         }
       }
       Serial.println("Has the parachute been packed correctly inside the nose cone? (type 'yes' when ready to proceed)");
-      while (inputFlag3 == false) {
-        while (Serial.available()==0){}
-        String userInput3 = Serial.readString();
+      while (inputFlag3 == false) { //While loop to make sure the user inputs only 'yes' when they are ready to proceed
+        while (Serial.available()==0){} //Delays the program from progressing until the user enters something into the Serial monitor prompt
+        String userInput3 = Serial.readString(); //sets userInput3 equal to the serial input submitted by the user
         delay(100);
-        if (userInput3 == "yes" or userInput3 == "Yes") {
+        if (userInput3 == "yes" or userInput3 == "Yes") { //proceeds if the user inputs 'yes'
           delay(100);
-          myServo3.write(90);
+          //myServo3.write(90); --IS THIS NEEDED? FIX AFTER TESTING
           Serial.println("Continuing to next flight stage in 15 seconds");
           delay(10000);
-          inputFlag3 = true;
-          break;
+          inputFlag3 = true; //changes the flag to from false to true to stop the while loop
+          break; //backup break for while loop
         }
-        else {
+        else { //repeats prompt if user does not input 'yes'
           Serial.println("Please type 'yes' when you are ready to proceed");
-          inputFlag3 = false;
+          inputFlag3 = false; //keeps the flag equal to false so the loop repeats
         }
       }
-      inputFlag1 = true;
-      break;
-      break;
+      inputFlag1 = true; //changes the flag to from false to true to stop the while loop
+      break; //backup break for while loop
+      break; //backup break for while loop
     }
-    else if (userInput1 == "no" or userInput1 == "No") {
+    else if (userInput1 == "no" or userInput1 == "No") { //Protocol for when the parachute does not need to be packed --immediately skips to countdown to powered flight stage
       Serial.println("Continuing to next Flight Stage in 15 seconds");
       delay(10000);
-      inputFlag1 = true;
-      break;
+      inputFlag1 = true; //changes the flag to from false to true to stop the while loop
     }
-    else {
+    else { //repeats prompt if user does not input 'yes' or 'no'
       Serial.println("Please respond only with either 'yes' or 'no'");
-      inputFlag1 = false;
+      inputFlag1 = false; //keeps the flag equal to false so the loop repeats
     }
   }
 }
@@ -341,15 +341,16 @@ void chutePacking() {
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
 //Function that waits to start powered flight stage until the rocket recognizes an upward acceleration
-void poweredFlightStall() {
+void poweredFlightStall() { //Function that waits to start the PID algorithm until the BNO055 senses a vertical acceleration from the rocket motor firing
   
   bool flightStallFlag = true;
   short flightStallCount = 0;
   while (flightStallFlag = true) {
     imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);\
 
-    float accelY = accel.y();
-    
+    float accelY = accel.y(); //declares accelY equal to the vertical acceleration measured by the BNO055 sensor
+
+    //Print statement for acceleration read by BNO055 -- can be commented out to reduce time between samples for more accurate start time
 //    Serial.print(F("accelX= "));
 //    Serial.print(accelX);
 //    Serial.print(F(" accelY= "));
@@ -358,15 +359,18 @@ void poweredFlightStall() {
 //    Serial.print(accelZ);
 
     if (accelY > 1){
-      flightStallCount++;
+      flightStallCount++; //adds 1 to the counter
     }
-    else flightStallCount = 0;
+    else flightStallCount = 0; //resets counter to require consecutive measurements for the flight stall function to end
 
-    if (flightStallCount > 3){     
+    if (flightStallCount > 3){ //Waits for counter to equal 3 to avoid misfiring from potential misreadings from sensor     
       break;
     }
+
+    //Print statement to test stall counter functionality -- should be commented out during actual flights because it is unnecessary in that scenario
     //Serial.print(F(" Count= "));
-    Serial.println(flightStallCount);
+    //Serial.println(flightStallCount);
+    
   }
 }
 
@@ -499,8 +503,8 @@ void poweredFlight() {
       
 
     // Print Statement for all relevant information while for loop is active ----- Can be commented out during actual flights to reduce lag between measurements
-    Serial.print(F("n= "));
-    Serial.println(universalIndex);
+//    Serial.print(F("n= "));
+//    Serial.println(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
 //    Serial.print(F(" ThetaX= "));
@@ -566,7 +570,7 @@ void poweredFlight() {
     //----------------------------------------------------------------------------
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    //delay(BNO055_SAMPLERATE_DELAY_MS); //Delay for selected BNO sample rate
+    //delay(BNO055_SAMPLERATE_DELAY_MS); //Delay for selected BNO sample rate -- can be commented out if time between measurements already exceeds 10ms due to calculation time and loops
     
   }
   
@@ -755,8 +759,8 @@ void poweredFlight() {
 
     // Print Statement for all relevant information while PID loop is active ----- Can be commented out during actual flights to reduce lag between measurements
         
-    Serial.print(F("n= "));
-    Serial.println(universalIndex);
+//    Serial.print(F("n= "));
+//    Serial.println(universalIndex);
 //    Serial.print(F(" runtime= "));
 //    Serial.print(runtime[n]);
 //    Serial.print(F(" ThetaX= "));
@@ -822,7 +826,7 @@ void poweredFlight() {
     //---------------------------------------------------------------------------
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    //delay(BNO055_SAMPLERATE_DELAY_MS);//Delay for selected BNO sample rate  
+    //delay(BNO055_SAMPLERATE_DELAY_MS);//Delay for selected BNO sample rate -- can be commented out if time between measurements already exceeds 10ms due to calculation time and loops
   }
   
 }
@@ -841,7 +845,7 @@ void unpoweredFlight() {
   altitudePrev = altitude; //Variable to keep track of and compare the current altitude measurement to the previous one
   pressurePrev = pressure; //Variable to keep track of and compare the current pressure measurement to the previous one
   
-  short unpoweredIndex = 0;
+  short unpoweredIndex = 0;//initial declaration statement
   bool unpoweredFlag = true; //Flag to mark whether or not the loop keeps going
   while (unpoweredFlag == true) { //While loop to record orientation, altitude, and pressure data until the rocket begins descending
     
@@ -921,22 +925,23 @@ void unpoweredFlight() {
     //No need to record gimbal or servo angles on fram chip anymore because they are no longer in use
 
     if (altitude < altitudePrev){ //and pressure > pressurePrev) { //Condition to end the loop and progress to the next flight stage
-      unpoweredIndex++;
+      unpoweredIndex++; //adds 1 to index counter
     }
     
-    if (unpoweredIndex > 5){ //and pressure > pressurePrev) { //Condition to end the loop and progress to the next flight stage
+    if (unpoweredIndex > 3){ //and pressure > pressurePrev) { //Condition to end the loop and progress to the next flight stage
       Serial.println("Unpowered Flight Loop Broken");
-      unpoweredFlag = false;
-      break;
+      unpoweredFlag = false; //sets flag equal to false instead of true to stop the loop
+      break; //backup break for loop
     }    
 
-    Serial.println(unpoweredIndex);
+    //Print statement for index number for testing functionality -- should be commented out during actual flight tests because it is unnecessary in that scenario
+    //Serial.println(unpoweredIndex);
     
     altitudePrev = altitude; //Sets the previous altitude measurement equal to the current one in preparation to take a new measurement
     pressurePrev = pressure; //Sets the previous pressure measurement equal to the current one in preparation to take a new measurement
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(50);//Delay for selected BNO sample rate
+    delay(50);//Delay between measurements -- 50ms instead of 10ms to conserve space on FRAM memory chip
   }
 }
 
@@ -1030,12 +1035,12 @@ void ballisticDescent() {
 
     if (altitude < chuteAltitude){ //Altitude threshold for parachute deployment -- measured in m above sea level -- *HEIGHT CAN BE CHANGED IN HEADER FILE*
       Serial.println(F("Ballistic Descent Loop Broken"));
-      ballisticFlag = false;
-      break;
+      ballisticFlag = false; //sets flag equal to false instead of true to stop the loop
+      break; //backup break for loop
     }
     
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(50); //Delay for selected BNO sample rate
+    delay(50); //Delay between measurements -- 50ms instead of 10ms to conserve space on FRAM memory chip
   } 
   
 }
@@ -1096,16 +1101,17 @@ void chuteDescent() {
 
     if (chuteIndex == 10) { //If statement to end chute descent loop after 20 consecutive, identical altitude measurements (2 seconds worth of measurements)
       Serial.println(F("Chute Descent Loop Broken"));
-      chuteFlag = false;
-      break;
+      chuteFlag = false; //sets flag equal to false instead of true to stop the loop
+      break; //backup break for loop
     }
 
-    Serial.println(chuteIndex);
+    //Print statement for index number for testing functionality -- should be commented out during actual flight tests because it is unnecessary in that scenario
+    //Serial.println(chuteIndex);
 
     altitudePrev = altitude; //Sets the previous altitude measurement equal to the current one in preparation to take a new measurement
 
     universalIndex++; //Adds +1 to measurement counting index universal between all functions
-    delay(50); //Delay for selected BNO sample rate
+    delay(50); //Delay between measurements -- 50ms instead of 10ms to conserve space on FRAM memory chip
     
   }
 }
@@ -1119,11 +1125,11 @@ void landing() {
 //Code to be run by the arduino once, includes all functions above in order
 void setup() {
   
-  groundIdle();
-  poweredFlight();
-  unpoweredFlight();
-  ballisticDescent();
-  chuteDescent();
+  groundIdle(); //Runs ground idle function
+  poweredFlight(); //Runs powered flight function
+  unpoweredFlight(); //Runs unpowered flight function
+  ballisticDescent(); //Runs ballistic descent function
+  chuteDescent(); //runs chute descent function
  
 }
 
